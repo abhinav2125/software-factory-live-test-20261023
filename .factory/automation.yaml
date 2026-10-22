@@ -1,0 +1,12 @@
+version: 1
+enabled: true
+issueLabel: factory
+allow:
+  - src/**
+deny:
+  - test/**
+  - package.json
+verification:
+  - [npm, test]
+maxUsd: '1.000000'
+timeoutSeconds: 300
