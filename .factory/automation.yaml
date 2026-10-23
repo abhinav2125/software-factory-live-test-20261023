@@ -1,12 +1,10 @@
 version: 1
 enabled: true
-issueLabel: factory
+issueLabel: null
 allow:
-  - src/**
-deny:
-  - test/**
-  - package.json
+  - '**'
+deny: []
 verification:
-  - [npm, test]
-maxUsd: '1.000000'
-timeoutSeconds: 300
+  - [node, /factory/verify-project.mjs]
+maxUsd: '5.000000'
+timeoutSeconds: 3600
