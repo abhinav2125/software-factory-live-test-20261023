@@ -1,3 +1,3 @@
 export function uniqueStrings(values) {
-  return [...values];
+  return [...new Set(values)];
 }
