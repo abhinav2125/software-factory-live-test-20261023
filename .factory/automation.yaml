@@ -6,5 +6,5 @@ allow:
 deny: []
 verification:
   - [node, /factory/verify-project.mjs]
-maxUsd: '5.000000'
+maxUsd: null
 timeoutSeconds: 3600
