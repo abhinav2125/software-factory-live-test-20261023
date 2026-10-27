@@ -1,0 +1,156 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "../tokens.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* Brand */
+  --color-lavender: var(--lavender);
+  --color-lavender-deep: var(--lavender-deep);
+  --color-lavender-soft: var(--lavender-soft);
+  --color-acid-lime: var(--acid-lime);
+  --color-acid-lime-deep: var(--acid-lime-deep);
+  --color-vermilion: var(--vermilion);
+  --color-vermilion-soft: var(--vermilion-soft);
+
+  /* Neutrals */
+  --color-ink-950: var(--ink-950);
+  --color-ink-900: var(--ink-900);
+  --color-ink-850: var(--ink-850);
+  --color-ink-800: var(--ink-800);
+  --color-ink-700: var(--ink-700);
+  --color-ink-600: var(--ink-600);
+  --color-ink-400: var(--ink-400);
+  --color-ink-300: var(--ink-300);
+  --color-ink-200: var(--ink-200);
+  --color-ink-100: var(--ink-100);
+  --color-ink-50: var(--ink-50);
+
+  /* Semantic (shadcn/ui) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Typography */
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+
+  /* Radii */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  /* Elevation */
+  --shadow-panel: var(--shadow-panel);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-cta: var(--shadow-cta);
+  --shadow-lavender-glow: var(--shadow-lavender-glow);
+
+  /* Motion */
+  --ease-out-expo: var(--ease-out-expo);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-acid-lime);
+    color: var(--color-ink-950);
+  }
+
+  :focus-visible {
+    outline: var(--ring-width) solid var(--color-ring);
+    outline-offset: var(--ring-offset);
+    border-radius: var(--radius-sm);
+  }
+}
+
+@layer utilities {
+  .container-site {
+    margin-inline: auto;
+    width: 100%;
+    max-width: var(--container-max);
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .container-site {
+      padding-inline: 2rem;
+    }
+  }
+
+  .section-y {
+    padding-block: var(--section-y);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  /* Layered, tactile surface used by panels and cards. */
+  .surface-panel {
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .surface-raised {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-ink-800) 92%, var(--color-lavender) 8%),
+      var(--color-ink-850)
+    );
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-raised);
+  }
+
+  /* Hairline grid backdrop for technical sections. */
+  .bg-blueprint {
+    background-image:
+      linear-gradient(to right, color-mix(in srgb, var(--color-lavender) 7%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--color-lavender) 7%, transparent) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+}
