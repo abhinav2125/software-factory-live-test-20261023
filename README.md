@@ -1,43 +1,59 @@
-# Software Factory live test
+# Software Factory — Landing Page
 
-This repository is enrolled in the persistent Software Factory service on Portainer. Every open issue posted by a current write, maintain or admin collaborator is eligible automatically; no label or manual runner command is required.
+A production-quality Next.js landing page presenting the **Software Factory**: an AI-assisted delivery platform that turns product briefs into reviewed, tested software through reusable workflows and agent orchestration.
 
-The solver runs OpenCode through the existing LiteLLM `qwen3-coder-next` route. It can add or update project source, documentation, tests, package dependencies and root configuration. Execution policy, CI authority and credentials remain protected.
+## Technology stack
 
-A fresh verifier installs public npm dependencies and runs the project's lint, typecheck, test and build scripts when present. Next.js projects require a production build script; other checks run when present. The service creates a pull request after successful verification. Humans review and merge all pull requests.
+- **Next.js 16** (App Router) + **React 19** + **TypeScript** (strict)
+- **Tailwind CSS v4** (`@tailwindcss/postcss`, CSS-first config) + **shadcn/ui** (new-york)
+- **Lucide React** icons, **Framer Motion** animation
+- **React Three Fiber + drei + three** hero scene with WebGL detection and SVG fallback
 
-Model spending has no dollar cap, as authorized by the repository owner. Each solve/verification stage has a one-hour deadline. The controller polls GitHub every five seconds, retains state in PostgreSQL, and restarts automatically with its workers.
-
-Generated dependencies, caches and production output must remain untracked. Include package-lock.json and any required TypeScript configuration in application changes.
-
-## The website
-
-This repository also contains a small Next.js (App Router) demo site for the Software Factory service:
-
-- `/` — the home page, describing what the service does and how it works.
-- `/about` — the About Us page, describing the product's purpose and the team's approach to quality.
-
-Both pages share a semantic navigation bar (a `<nav aria-label="Primary">` landmark) with **Home** (`/`) and **About Us** (`/about`) links that use Next.js client-side navigation (`next/link`). The layout uses system fonts only — no external fonts, images, or scripts — and remains usable at a 375px mobile viewport.
-
-### Running the site
+## Getting started
 
 ```sh
-npm install        # or: npm ci
-npm run dev        # development server (defaults to http://localhost:3000)
+npm install        # install dependencies (regenerates package-lock.json)
+npm run dev        # development server at http://localhost:3000
 ```
 
-Then open `http://localhost:3000/` for the home page and `http://localhost:3000/about` for the About Us page. The navbar links navigate between the two routes; direct loads and refreshes of `/about` also work.
-
-### Production build and start
+## Verification
 
 ```sh
-npm run build      # production build (next build --webpack)
-npm start          # serve the production build on http://localhost:3000
+npm run lint       # ESLint (flat config)
+npm run typecheck  # tsc --noEmit
+npm test           # node --test
+npm run build      # production build and HTTP route/navigation checks
+npm run verify:routes # repeat route checks against an existing production build
+npm start          # serve the production build
 ```
 
-### Tests
+## Project structure
 
-```sh
-npm test           # node --test: unique-strings unit tests plus render tests
-                   # for the shared navbar and both pages
 ```
+app/                  layout, page, globals.css (Tailwind @theme mappings)
+app/about/            About Us route; shared navigation/footer live in the layout
+components/ui/        shadcn/ui primitives (button, badge, card)
+components/landing/   page sections: navbar, hero, capabilities, how-it-works,
+                      product-preview, final-cta, footer
+components/three/     R3F factory scene + WebGL wrapper/fallback
+lib/utils.ts          cn() helper
+tokens.css            design tokens (brand colors, neutrals, semantic, motion)
+public/fonts/         self-hosted brand fonts and their SIL Open Font licenses
+scripts/verify-routes.mts # production HTTP regression checks for both routes
+AGENTS.md             conventions for coding agents
+DESIGN.md             design system documentation
+```
+
+## Design system
+
+Brand colors — Lavender `#CBB3E8`, Acid Lime `#D4FF3F`, Vermilion `#E34234` — are defined once in `tokens.css` and mapped to Tailwind/shadcn semantic utilities in `app/globals.css`. See [DESIGN.md](DESIGN.md) for the full system.
+
+The Home and About Us links are available in the shared desktop and mobile navigation. Product section links return to the landing page from either route. Inter, Space Grotesk, and JetBrains Mono are bundled locally so production builds do not need a font download service.
+
+The route check starts a temporary production server, checks the full landing page, About content, navigation destinations, direct refresh, and hydration assets, then stops the server. It replaces the standalone scaffold's component mocks with checks against the integrated application.
+
+## Known limitations
+
+- The product preview is an **illustrative demo** (labeled in the UI); live orchestration requires a future hosted backend.
+- CTA buttons ("Start building", "Sign in", "Watch the workflow") are placeholders pending real destinations; footer resource links are `#` placeholders.
+- Visual/browser testing (screenshots, real-pointer interaction) was not performed in this environment; behavior was verified via lint, typecheck, unit tests, and a production build.
