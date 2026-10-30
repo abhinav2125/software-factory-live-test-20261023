@@ -1,10 +1,11 @@
 import { Factory } from "lucide-react";
+import Link from "next/link";
 
 const columns = [
   {
     heading: "Product",
     links: ["Capabilities", "How it works", "Preview", "Roadmap"],
-    hrefs: ["#capabilities", "#how-it-works", "#preview", "#"],
+    hrefs: ["/#capabilities", "/#how-it-works", "/#preview", "#"],
   },
   {
     heading: "Resources",
@@ -14,7 +15,7 @@ const columns = [
   {
     heading: "Company",
     links: ["About", "Blog", "Careers", "Contact"],
-    hrefs: ["#", "#", "#", "#"],
+    hrefs: ["/about", "#", "#", "#"],
   },
 ];
 
@@ -23,14 +24,14 @@ export function Footer() {
     <footer className="border-t border-border">
       <div className="container-site grid gap-10 py-14 md:grid-cols-[1.2fr_repeat(3,1fr)]">
         <div>
-          <a href="#top" className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5">
             <span className="surface-raised flex size-9 items-center justify-center rounded-lg">
               <Factory className="size-5 text-acid-lime" aria-hidden="true" />
             </span>
             <span className="font-display text-lg font-semibold tracking-tight">
               Software Factory
             </span>
-          </a>
+          </Link>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
             AI-assisted software delivery: from product brief to reviewed,
             tested pull requests.
@@ -44,12 +45,12 @@ export function Footer() {
             <ul className="mt-4 space-y-2.5">
               {col.links.map((label, i) => (
                 <li key={label}>
-                  <a
+                  <Link
                     href={col.hrefs[i]}
                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

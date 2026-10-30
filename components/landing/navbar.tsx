@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Factory, Menu, X, ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const links = [
-  { href: "#capabilities", label: "Capabilities" },
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#preview", label: "Preview" },
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About Us" },
+  { href: "/#capabilities", label: "Capabilities" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#preview", label: "Preview" },
 ];
 
 export function Navbar() {
@@ -42,24 +45,24 @@ export function Navbar() {
         aria-label="Primary"
         className="container-site flex h-16 items-center justify-between"
       >
-        <a href="#top" className="flex items-center gap-2.5">
+        <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2.5">
           <span className="surface-raised flex size-9 items-center justify-center rounded-lg">
             <Factory className="size-5 text-acid-lime" aria-hidden="true" />
           </span>
           <span className="font-display text-lg font-semibold tracking-tight">
             Software Factory
           </span>
-        </a>
+        </Link>
 
-        <ul className="hidden items-center gap-8 md:flex">
+        <ul className="hidden items-center gap-4 md:flex lg:gap-8">
           {links.map((link) => (
-            <li key={link.href}>
-              <a
+            <li key={link.href} className={link.href.startsWith("/#") ? "hidden lg:block" : undefined}>
+              <Link
                 href={link.href}
                 className="text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -91,17 +94,17 @@ export function Navbar() {
       </nav>
 
       {open && (
-        <div id="mobile-nav" className="border-t border-border md:hidden">
+        <nav id="mobile-nav" aria-label="Mobile primary" className="border-t border-border md:hidden">
           <ul className="container-site flex flex-col gap-1 py-4">
             {links.map((link) => (
               <li key={link.href}>
-                <a
+                <Link
                   href={link.href}
                   onClick={() => setOpen(false)}
                   className="block rounded-md px-3 py-2.5 text-base text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
             <li className="mt-2 flex gap-3 px-3">
@@ -114,7 +117,7 @@ export function Navbar() {
               </Button>
             </li>
           </ul>
-        </div>
+        </nav>
       )}
     </header>
   );
