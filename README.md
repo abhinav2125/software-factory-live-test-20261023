@@ -27,11 +27,17 @@ npm run verify:routes # repeat route checks against an existing production build
 npm start          # serve the production build
 ```
 
+`scripts/verify-routes.mts` covers all three routes: the landing sections,
+About Us, and the Contact Us page (heading, GitHub issue destination, navbar and
+footer links on every route, direct refresh of `/contact`, and navigation back
+to Home and About Us).
+
 ## Project structure
 
 ```
 app/                  layout, page, globals.css (Tailwind @theme mappings)
 app/about/            About Us route; shared navigation/footer live in the layout
+app/contact/          Contact Us route (GitHub issue channel)
 components/ui/        shadcn/ui primitives (button, badge, card)
 components/landing/   page sections: navbar, hero, capabilities, how-it-works,
                       product-preview, final-cta, footer
@@ -39,7 +45,7 @@ components/three/     R3F factory scene + WebGL wrapper/fallback
 lib/utils.ts          cn() helper
 tokens.css            design tokens (brand colors, neutrals, semantic, motion)
 public/fonts/         self-hosted brand fonts and their SIL Open Font licenses
-scripts/verify-routes.mts # production HTTP regression checks for both routes
+scripts/verify-routes.mts # production HTTP regression checks for all three routes
 AGENTS.md             conventions for coding agents
 DESIGN.md             design system documentation
 ```
@@ -48,12 +54,13 @@ DESIGN.md             design system documentation
 
 Brand colors — Lavender `#CBB3E8`, Acid Lime `#D4FF3F`, Vermilion `#E34234` — are defined once in `tokens.css` and mapped to Tailwind/shadcn semantic utilities in `app/globals.css`. See [DESIGN.md](DESIGN.md) for the full system.
 
-The Home and About Us links are available in the shared desktop and mobile navigation. Product section links return to the landing page from either route. Inter, Space Grotesk, and JetBrains Mono are bundled locally so production builds do not need a font download service.
+The Home, About Us, and Contact links are available in the shared desktop and mobile navigation, and Contact is also linked from the footer. Product section links return to the landing page from every route. Inter, Space Grotesk, and JetBrains Mono are bundled locally so production builds do not need a font download service.
 
-The route check starts a temporary production server, checks the full landing page, About content, navigation destinations, direct refresh, and hydration assets, then stops the server. It replaces the standalone scaffold's component mocks with checks against the integrated application.
+The route check starts a temporary production server, checks the full landing page, About content, Contact content (heading, copy, and the `Open a GitHub issue` destination), navigation destinations, direct refresh, and hydration assets, then stops the server. It replaces the standalone scaffold's component mocks with checks against the integrated application.
 
 ## Known limitations
 
 - The product preview is an **illustrative demo** (labeled in the UI); live orchestration requires a future hosted backend.
-- CTA buttons ("Start building", "Sign in", "Watch the workflow") are placeholders pending real destinations; footer resource links are `#` placeholders.
+- CTA buttons ("Start building", "Sign in", "Watch the workflow") are placeholders pending real destinations; footer resource links are `#` placeholders. The Contact page has one working contact destination: opening a GitHub issue.
+- There is no email service, backend form, or support desk; the GitHub issue tracker is the only contact channel.
 - Visual/browser testing (screenshots, real-pointer interaction) was not performed in this environment; behavior was verified via lint, typecheck, unit tests, and a production build.

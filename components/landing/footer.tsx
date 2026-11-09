@@ -15,7 +15,7 @@ const columns = [
   {
     heading: "Company",
     links: ["About", "Blog", "Careers", "Contact"],
-    hrefs: ["/about", "#", "#", "#"],
+    hrefs: ["/about", "#", "#", "/contact"],
   },
 ];
 

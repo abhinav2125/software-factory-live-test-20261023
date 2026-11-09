@@ -4,6 +4,8 @@ import { once } from "node:events";
 import { setTimeout as delay } from "node:timers/promises";
 
 const origin = "http://127.0.0.1:3210";
+const githubIssueUrl =
+  "https://github.com/abhinav2125/software-factory-live-test-20261023/issues/new";
 const server = spawn(process.execPath, [
   "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", "3210",
 ], { stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" } });
@@ -22,16 +24,29 @@ async function page(path: string) {
 function heading(html: string) {
   return text(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "");
 }
-function primaryNav(html: string) {
-  const nav = html.match(/<nav\b[^>]*aria-label="Primary"[^>]*>[\s\S]*?<\/nav>/i)?.[0];
-  assert.ok(nav, "Shared primary navigation is rendered");
-  const links = [...nav.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi)]
+function linksWithin(html: string, pattern: RegExp, label: string) {
+  const scope = html.match(pattern)?.[0];
+  assert.ok(scope, `${label} is rendered`);
+  return [...scope.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi)]
     .map((match) => ({ href: match[1], label: text(match[2]) }));
-  for (const [label, href] of [["Home", "/"], ["About Us", "/about"]]) {
+}
+function primaryNav(html: string) {
+  const links = linksWithin(html, /<nav\b[^>]*aria-label="Primary"[^>]*>[\s\S]*?<\/nav>/i,
+    "Shared primary navigation");
+  for (const [label, href] of [["Home", "/"], ["About Us", "/about"], ["Contact", "/contact"]]) {
     assert.ok(links.some((link) => link.label === label && link.href === href), `${label} links to ${href}`);
   }
   for (const id of ["capabilities", "how-it-works", "preview"]) {
     assert.ok(links.some((link) => link.href === `/#${id}`), `Home section link /#${id}`);
+  }
+}
+function sharedFooter(html: string) {
+  const links = linksWithin(html, /<footer\b[\s\S]*?<\/footer>/i, "Shared footer");
+  for (const [label, href] of [["About", "/about"], ["Contact", "/contact"]]) {
+    assert.ok(links.some((link) => link.label === label && link.href === href), `Footer ${label} links to ${href}`);
+  }
+  for (const id of ["capabilities", "how-it-works", "preview"]) {
+    assert.ok(links.some((link) => link.href === `/#${id}`), `Footer home section link /#${id}`);
   }
 }
 try {
@@ -53,16 +68,42 @@ try {
     assert.ok(home.includes(`id="${id}"`), `Retained landing section ${id}`);
   }
   primaryNav(home);
+  sharedFooter(home);
   const about = await page("/about");
   assert.equal(heading(about), "About Us");
   primaryNav(about);
+  sharedFooter(about);
   for (const section of ["Our purpose", "How we approach quality", "The team"]) {
     assert.ok(about.includes(section), `About content: ${section}`);
   }
   assert.ok(about.includes("<!-- factory-live-e2e:20261030-about-us -->"));
   assert.equal(heading(await page("/about")), "About Us", "Direct About refresh");
+
+  const contact = await page("/contact");
+  assert.equal(heading(contact), "Contact Us");
+  primaryNav(contact);
+  sharedFooter(contact);
+  const contactLinks = [...contact.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi)]
+    .map((match) => ({ href: match[1], label: text(match[2]) }));
+  assert.ok(
+    contactLinks.some((link) => link.label === "Open a GitHub issue" && link.href === githubIssueUrl),
+    "Contact action opens the GitHub issue form",
+  );
+  assert.ok(contact.includes(githubIssueUrl), "GitHub issue destination is rendered");
+  for (const word of ["question", "feedback", "collaboration"]) {
+    assert.ok(text(contact).toLowerCase().includes(word), `Contact copy mentions ${word}`);
+  }
+  assert.ok(!/<a\b[^>]*href="(mailto:|tel:)/i.test(contact), "No invented email or phone contact channel");
+  assert.ok(contact.includes("<!-- factory-live-e2e:20261030-contact-page -->"));
+  assert.equal(heading(await page("/contact")), "Contact Us", "Direct Contact refresh");
+
   assert.equal(heading(await page("/")), heading(home), "Home navigation returns to the full landing page");
-  for (const html of [home, about]) {
+  assert.equal(heading(await page("/about")), heading(about), "Contact navigation back to About Us");
+  assert.ok(
+    (await page("/")).includes(`id="capabilities"`),
+    "Contact navigation back to Home keeps the landing sections",
+  );
+  for (const html of [home, about, contact]) {
     assert.equal((html.match(/<main\b/g) ?? []).length, 1, "One main landmark per route");
     assert.equal((html.match(/<footer\b/g) ?? []).length, 1, "One shared footer per route");
     const scripts = [...html.matchAll(/<script\b[^>]*src="([^"]+)"/g)].map((match) => match[1]);
@@ -75,8 +116,9 @@ try {
     }
   }
   console.log(JSON.stringify({ passed: true, productionServer: true, homeStatus: 200,
-    aboutStatus: 200, retainedLandingSections: 3, sharedNavigation: true,
-    directAboutRefresh: true, hydrationScriptsAvailable: true, externalScripts: false }));
+    aboutStatus: 200, contactStatus: 200, retainedLandingSections: 3, sharedNavigation: true,
+    contactAction: githubIssueUrl, directAboutRefresh: true, directContactRefresh: true,
+    hydrationScriptsAvailable: true, externalScripts: false }));
 } finally {
   if (server.exitCode === null && !startupError) {
     const stopped = once(server, "exit");
